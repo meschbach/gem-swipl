@@ -5,7 +5,7 @@ require 'swipl/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "swipl"
-  spec.version       = Swipl::VERSION
+  spec.version       = SWIPL::VERSION
   spec.authors       = ["Mark Eschbach"]
   spec.email         = ["meschbach@gmail.com"]
 

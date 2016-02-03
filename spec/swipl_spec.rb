@@ -1,11 +1,19 @@
 require 'spec_helper'
 
-describe Swipl do
+describe SWIPL do
   it 'has a version number' do
-    expect(Swipl::VERSION).not_to be nil
+    expect(SWIPL::VERSION).not_to be nil
   end
 
-  it 'does something useful' do
-    expect(false).to eq(true)
+  it 'true when consulting predicate true' do
+		expect(SWIPL::verify('true')).to be true
   end
+
+  it 'false when consulting predicate true' do
+		expect(SWIPL::verify('false')).to be false
+  end
+
+	it 'verifies compound predicates' do
+		expect(SWIPL::verify("consult('spec/compound_predicates.pl'), loaded_custom")).to be true
+	end
 end
