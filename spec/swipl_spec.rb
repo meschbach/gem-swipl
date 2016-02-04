@@ -13,7 +13,11 @@ describe SWIPL do
 		expect(SWIPL::verify('false')).to be false
   end
 
-	it 'verifies compound predicates' do
+	it 'verifies compound query loading from file' do
 		expect(SWIPL::verify("consult('spec/compound_predicates.pl'), loaded_custom")).to be true
+	end
+
+	it 'verifies compound queries containing backtracking' do
+		expect(SWIPL::verify("( B = a ; B = b ), B = b")).to be true
 	end
 end
