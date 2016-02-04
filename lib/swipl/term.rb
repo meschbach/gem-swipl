@@ -22,7 +22,7 @@ module SWIPL
 		end
 
 		def as_atom
-			str_ptr = FFI::MemoryPointer.new( :pointer, 1 )
+			str_ptr = ::FFI::MemoryPointer.new( :pointer, 1 )
 			if SWIPL::FFI.PL_get_atom_chars( @term_id, str_ptr ) == PL_FALSE
 				raise "failed to get term #{@term_id} as an atom"
 			end
