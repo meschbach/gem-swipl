@@ -32,6 +32,8 @@ Let's say you have the following prolog database in foods.pl:
 food( beef ).
 food( broccoli ).
 food( potatoes ).
+
+enjoys( mark, broccoli ).
 ```
 
 You can they load the database (assuming in the same directory) an query for all solutions as follows:
@@ -41,7 +43,7 @@ SWIPL::truth( "consult('foods.pl')" )
 foods = SWIPL::query( "food", 1 )
 ```
 
-Foods should now contain the follow (note: order of the elements may change):
+The variable foods should now contain the follow (note: order of the elements may change):
 ```ruby
 [ ["beef"], ["broccoli"], ["potatoes"] ]
 ```
@@ -64,6 +66,11 @@ SWIPL::PrologFrame.on do |frame|
 		query.close # if you forget this there will probably be some strange statement about no foreign frame
 	end
 end
+```
+
+Resulting output:
+```ruby
+["mark", "broccoli"]
 ```
 
 
