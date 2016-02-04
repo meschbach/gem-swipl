@@ -1,4 +1,4 @@
-require "swipl/ffi"
+require "swipl/cffi"
 require 'swipl/predicate'
 require 'swipl/prologframe'
 require 'swipl/query'
@@ -12,10 +12,10 @@ module SWIPL
 	PL_Q_NORMAL = 2
 
 	def self.verify( fact )
-		FFI.init
+		CFFI.init
 		PrologFrame.on do |frame|
 			atom = frame.atom_from_string( fact )
-			FFI.PL_call( atom.term_id, nil ) == PL_TRUE
+			CFFI.PL_call( atom.term_id, nil ) == PL_TRUE
 		end
 	end
 

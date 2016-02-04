@@ -1,4 +1,3 @@
-require 'ffi'
 
 module SWIPL
 	class PrologFrame
@@ -7,7 +6,7 @@ module SWIPL
 		end
 
 		def close
-			result = SWIPL::FFI.PL_discard_foreign_frame( @frame_id )
+			result = CFFI.PL_discard_foreign_frame( @frame_id )
 			if result == PL_FALSE
 				raise "Failed to close frame"
 			end
@@ -15,7 +14,7 @@ module SWIPL
 
 		# Opens a foreign frame
 		def self.open
-			frame_id = SWIPL::FFI.PL_open_foreign_frame
+			frame_id = CFFI.PL_open_foreign_frame
 			if frame_id == PL_FALSE 
 				raise "failed to open frame"
 			end
@@ -37,7 +36,7 @@ module SWIPL
 		def refs( count )
 			return [] if count == 0
 
-			base = SWIPL::FFI.PL_new_term_refs( count )
+			base = CFFI.PL_new_term_refs( count )
 			#TODO: Verify the result of the query
 			(0..(count-1)).map do |index|
 				Term.new( base + index )
@@ -45,9 +44,9 @@ module SWIPL
 		end
 
 		def atom_from_string( string )
-			atom_ptr = ::FFI::MemoryPointer.from_string( string.to_s )
-			atom_term = SWIPL::FFI.PL_new_term_ref
-			if SWIPL::FFI.PL_chars_to_term( atom_ptr, atom_term ) == 0
+			atom_ptr = FFI::MemoryPointer.from_string( string.to_s )
+			atom_term = CFFI.PL_new_term_ref
+			if CFFI.PL_chars_to_term( atom_ptr, atom_term ) == 0
 				raise "failed to create atom from terms"
 			end
 			Term.new( atom_term )

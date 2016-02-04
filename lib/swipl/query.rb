@@ -7,7 +7,7 @@ module SWIPL
 		end
 
 		def next_solution?
-			FFI.PL_next_solution( @query_id ) == PL_TRUE 
+			CFFI.PL_next_solution( @query_id ) == PL_TRUE 
 		end
 
 		def each_solution
@@ -17,7 +17,7 @@ module SWIPL
 		end
 
 		def close
-			FFI.PL_close_query( @query_id )
+			CFFI.PL_close_query( @query_id )
 		end
 	end
 end

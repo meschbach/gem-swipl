@@ -1,4 +1,3 @@
-require 'swipl/ffi'
 
 module SWIPL
 	class Predicate
@@ -8,15 +7,15 @@ module SWIPL
 		end
 
 		def self.find( name, arity )
-			name_ptr = ::FFI::MemoryPointer.from_string( name.to_s )
-			id = FFI.PL_predicate( name_ptr, arity, nil )
+			name_ptr = FFI::MemoryPointer.from_string( name.to_s )
+			id = CFFI.PL_predicate( name_ptr, arity, nil )
 			Predicate.new( id, arity )
 		end
 
 		# @param frame the frame to allocate the parameters
 		def query_normally( frame )
 			params = frame.refs( @arity )
-			query_id = FFI.PL_open_query( nil, PL_Q_NORMAL, @pred_id, params[0].id )
+			query_id = CFFI.PL_open_query( nil, PL_Q_NORMAL, @pred_id, params[0].id )
 			Query.new( query_id, params )
 		end
 

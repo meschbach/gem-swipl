@@ -1,8 +1,8 @@
 require 'ffi'
 
 module SWIPL
-	module FFI
-		extend ::FFI::Library
+	module CFFI
+		extend FFI::Library
 		ffi_lib ENV["SWI_LIB"]
 
 		attach_function :PL_open_foreign_frame, [], :ulong
