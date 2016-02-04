@@ -12,8 +12,7 @@ gem 'swipl'
 
 ## Usage
 
-TODO: Figure out how to remove the `SWI_LIB` variable
-Set `SWI_LIB` to the where you have the libswipl.{dylib,so,dll} file.  Unforunately I haven't figured out a better method for locating the library.
+Set `SWI_LIB` to the where you have the libswipl.{dylib,so,dll} file.  Unforunately I haven't figured out a better method for locating the library; open to ideas and pull requests to make this easier for client applications.
 
 ### Basic Usage
 
