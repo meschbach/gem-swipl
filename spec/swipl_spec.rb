@@ -26,4 +26,33 @@ describe SWIPL do
 		expect(SWIPL::query( "ediable", 1 )).to eq( [["cornbread"], ["mushroom"]] )
 		expect(SWIPL::verify( "unload_file('spec/call.pl')" )).to be true
 	end
+
+	it 'will provide all values' do
+		SWIPL::truth( "consult('spec/foods.pl')" )
+		expect(SWIPL::query( "food", 1 )).to eq( [["beef"], ["broccoli"], ["potatoes"]] )
+		SWIPL::truth( "unload_file('spec/food.pl')" )
+	end
+
+	def likes_solutions
+		solutions = []
+		SWIPL::PrologFrame.on do |frame|
+			human = frame.atom_from_string("mark")
+			predicate = SWIPL::Predicate.find( "enjoys", 2 )
+			query = predicate.query_normally_with( frame, [human, nil ] )
+			begin
+				query.each_solution do |solution|
+					solutions.push( solution[1].as_atom )
+				end
+			ensure
+				query.close
+			end
+		end
+		solutions
+	end
+
+	it 'applies bound variables' do
+		SWIPL::truth( "consult('spec/foods.pl')" )
+		expect( likes_solutions ).to eq(["broccoli"])
+		SWIPL::truth( "unload_file('spec/food.pl')" )
+	end
 end

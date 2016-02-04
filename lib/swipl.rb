@@ -34,4 +34,10 @@ module SWIPL
 		end
 		solutions
 	end
+
+	def self.truth( fact )
+		unless self.verify( fact )
+			raise "Truth '#{fact}' failed"
+		end
+	end
 end

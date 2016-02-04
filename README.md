@@ -1,8 +1,6 @@
-# Swipl
+# SWIPL
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/swipl`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+A Ruby Gem for binding to SWI Prolog. This uses Ruby's FFI gem for binding.
 
 ## Installation
 
@@ -12,23 +10,62 @@ Add this line to your application's Gemfile:
 gem 'swipl'
 ```
 
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install swipl
-
 ## Usage
 
-TODO: Write usage instructions here
+TODO: Figure out how to remove the `SWI_LIB` variable
+Set `SWI_LIB` to the where you have the libswipl.{dylib,so,dll} file.  Unforunately I haven't figured out a better method for locating the library.
 
-## Development
+### Basic Usage
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+You can query if a statement is truthy by passing it as string as follows:
+```ruby
+SWIPL::verify('true')
+```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+This will boot up the engine and run the query the Prolog for the answer.  Your programs can be arbitrarily complex, however this will only result in true or false.
+
+### Usage Level 2
+
+Let's say you have the following prolog database in foods.pl: 
+
+```prolog
+food( beef ).
+food( broccoli ).
+food( potatoes ).
+```
+
+You can they load the database (assuming in the same directory) an query for all solutions as follows:
+
+```ruby
+SWIPL::truth( "consult('foods.pl')" )
+foods = SWIPL::query( "food", 1 )
+```
+
+Foods should now contain the follow (note: order of the elements may change):
+```ruby
+[ ["beef"], ["broccoli"], ["potatoes"] ]
+```
+
+### Advanced Usage
+
+This is kind of a gnarly API right now.  My goal is to clean it up, but querying with bound variables is
+possible right now.
+
+```ruby
+SWIPL::PrologFrame.on do |frame|
+	human = frame.atom_from_string( "mark" )
+	predicate = SWIPL::Predicate.find( "enjoys", 2 )
+	query = predicate.query_normally_with( frame, [human, nil ] ) # nil will result in an unground variable
+	begin
+		query.each_solution do |solution|
+			puts solution
+		end
+	ensure
+		query.close # if you forget this there will probably be some strange statement about no foreign frame
+	end
+end
+```
+
 
 ## Contributing
 
