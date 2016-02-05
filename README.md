@@ -14,6 +14,8 @@ gem 'swipl'
 
 Set `SWI_LIB` to the where you have the libswipl.{dylib,so,dll} file.  Unforunately I haven't figured out a better method for locating the library; open to ideas and pull requests to make this easier for client applications.
 
+Please see SWIPL::CFFI for more advanced use cases.
+
 ### Basic Usage
 
 You can query if a statement is truthy by passing it as string as follows:
