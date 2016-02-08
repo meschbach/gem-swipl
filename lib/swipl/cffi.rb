@@ -3,6 +3,7 @@ require 'ffi'
 module SWIPL
 	module CFFI
 		extend FFI::Library
+		typedef :pointer, :foreign_t
 
 		def self.import_symbols
 			attach_function :PL_open_foreign_frame, [], :ulong
@@ -24,9 +25,12 @@ module SWIPL
 			attach_function :PL_next_solution, [:ulong], :int
 			attach_function :PL_open_query, [:pointer, :int, :ulong, :ulong], :ulong
 			attach_function :PL_predicate, [:pointer, :int, :pointer], :ulong
+			attach_function :PL_register_foreign, [:pointer, :int, :pointer, :int], :foreign_t
 			attach_function :PL_thread_self, [], :int
 			attach_function :PL_unify, [ :ulong, :ulong ], :int
 		end
+
+		def self.PL_succeed; PL_TRUE; end
 
 		def self.load( libraries )
 			ffi_lib libraries

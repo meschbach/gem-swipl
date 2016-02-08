@@ -10,6 +10,7 @@ module SWIPL
 	PL_FALSE = 2
 	PL_FAIL = PL_FALSE
 	PL_Q_NORMAL = 2
+	PL_FA_VARARGS =  8
 
 	def self.verify( fact )
 		CFFI.init
@@ -40,4 +41,24 @@ module SWIPL
 			raise "Truth '#{fact}' failed"
 		end
 	end
+
+	def self.ruby_predicate( name, arity, &block )
+		@registered = {} unless @registered
+		raise "predicate by that name is already registered" if @registered[ name ]
+
+		trampoline = FFI::Function.new( :uint, [:ulong, :int, :pointer] ) do |arg_base, arity, context|
+			arguments = (1..arity).map do |index|
+				Term.new( arg_base + index )
+			end
+			if block.call( arguments )
+				CFFI::PL_succeed()
+			else
+				PL_FALSE
+			end
+		end
+
+		name_ptr = FFI::MemoryPointer.from_string( name.to_s )
+		raise "Failed to register" unless CFFI.PL_register_foreign( name_ptr, arity, trampoline, PL_FA_VARARGS )
+	end
 end
+

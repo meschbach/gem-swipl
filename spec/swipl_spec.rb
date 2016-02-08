@@ -55,4 +55,17 @@ describe SWIPL do
 		expect( likes_solutions ).to eq(["broccoli"])
 		SWIPL::truth( "unload_file('spec/food.pl')" )
 	end
+
+	describe "Ruby predicates" do
+		it 'succeeds with a single argument' do
+			capture = nil
+			SWIPL::ruby_predicate "ruby_predicate_1", 1 do |args|
+				capture = args
+				true
+			end
+			expect( capture ).to be_nil
+			SWIPL::truth( "ruby_predicate_1(example_atom)" )
+			expect( capture ).to_not be_nil
+		end
+	end
 end
