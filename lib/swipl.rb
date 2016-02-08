@@ -46,10 +46,13 @@ module SWIPL
 		@registered = {} unless @registered
 		raise "predicate by that name is already registered" if @registered[ name ]
 
-		trampoline = FFI::Function.new( :uint, [:ulong, :int, :pointer] ) do |arg_base, arity, context|
-			arguments = (1..arity).map do |index|
+		trampoline = FFI::Function.new( :uint, [:ulong, :int, :pointer] ) do |arg_base, arity, control|
+			stage = CFFI.PL_foreign_control( control )
+
+			arguments = (0..(arity -1 )).map do |index|
 				Term.new( arg_base + index )
 			end
+
 			if block.call( arguments )
 				CFFI::PL_succeed()
 			else

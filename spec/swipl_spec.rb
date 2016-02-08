@@ -67,5 +67,16 @@ describe SWIPL do
 			SWIPL::truth( "ruby_predicate_1(example_atom)" )
 			expect( capture ).to_not be_nil
 		end
+
+		it 'correctly passes atoms in' do
+			capture = nil
+			SWIPL::ruby_predicate "ruby_predicate_atom_in", 1 do |args|
+				capture = args[0].as_atom
+				true
+			end
+			expect( capture ).to be_nil
+			SWIPL::truth( "ruby_predicate_atom_in(toast)" )
+			expect( capture ).to eq "toast"
+		end
 	end
 end

@@ -21,6 +21,7 @@ module SWIPL
 		end
 
 		def as_atom
+			raise "not na atom" unless atom?
 			str_ptr = FFI::MemoryPointer.new( :pointer, 1 )
 			if CFFI.PL_get_atom_chars( @term_id, str_ptr ) == PL_FALSE
 				raise "failed to get term #{@term_id} as an atom"

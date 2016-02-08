@@ -4,6 +4,7 @@ module SWIPL
 	module CFFI
 		extend FFI::Library
 		typedef :pointer, :foreign_t
+		typedef :pointer, :control_t
 
 		def self.import_symbols
 			attach_function :PL_open_foreign_frame, [], :ulong
@@ -15,6 +16,7 @@ module SWIPL
 			attach_function :PL_call, [:ulong, :pointer], :int
 			attach_function :PL_chars_to_term, [:pointer, :ulong], :int
 			attach_function :PL_close_query, [:ulong], :void
+			attach_function :PL_foreign_control, [:control_t], :int
 			attach_function :PL_get_atom_chars, [:ulong, :pointer], :int
 			attach_function :PL_initialise, [:int, :pointer], :int
 			attach_function :PL_is_atom, [:ulong], :int
