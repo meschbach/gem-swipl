@@ -101,7 +101,7 @@ describe SWIPL do
 	end
 
 	describe "Nondeterminsitic predicates" do
-		it "true when returning true" do
+		it "true when returning true on initial" do
 			SWIPL::nondet "ruby_nondet_true", 0 do
 				true
 			end
@@ -119,6 +119,26 @@ describe SWIPL do
 				end
 			end
 			expect( solutions ).to eq [[]]
+		end
+	
+		it "nothing when returning false on initial" do
+			SWIPL::nondet "ruby_nondet_false", 0 do
+				false
+			end
+
+			solutions = []
+			SWIPL::PrologFrame.on do |frame|
+				predicate = SWIPL::Predicate.find( "ruby_nondet_false", 0 )
+				query = predicate.query_normally_with( frame, [] )
+				begin
+					query.each_solution do |solution|
+						solutions.push( solution )
+					end
+				ensure
+					query.close
+				end
+			end
+			expect( solutions ).to eq []
 		end
 	end
 end
