@@ -74,6 +74,15 @@ Resulting output:
 ["mark", "broccoli"]
 ```
 
+#### Defining deterministic ruby predicates
+
+```ruby
+SWIPL::deterministic "always_true", 0 do
+	SWIPL::PL_TRUE
+end
+
+SWIPL::verify( "always_true" ) == true
+```
 
 ## Contributing
 

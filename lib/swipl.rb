@@ -56,6 +56,7 @@ module SWIPL
 	end
 
 	def self.deterministic( name, arity, &block )
+		CFFI.init
 		@registered = {} unless @registered
 		raise "predicate by that name is already registered" if @registered[ name ]
 
@@ -93,6 +94,8 @@ module SWIPL
 	end
 
 	def self.nondet( name, arity, &handler )
+		CFFI.init
+
 		@registered = {} unless @registered
 		raise "predicate by that name is already registered" if @registered[ name ]
 
