@@ -91,5 +91,24 @@ module SWIPL
 		name_ptr = FFI::MemoryPointer.from_string( name.to_s )
 		raise "Failed to register" unless CFFI.PL_register_foreign( name_ptr, arity, trampoline, PL_FA_VARARGS )
 	end
+
+	#
+	# TODO: expand to support arity > 0 
+	#
+	def self.find_all( name, args = [] )
+		solutions = []
+		SWIPL::PrologFrame.on do |frame|
+			predicate = SWIPL::Predicate.find( name, args.length )
+			query = predicate.query_normally_with( frame, args )
+			begin
+				query.each_solution do |solution|
+					solutions.push( solution )
+				end
+			ensure
+				query.close
+			end
+		end
+		solutions
+	end
 end
 

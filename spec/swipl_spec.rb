@@ -105,40 +105,14 @@ describe SWIPL do
 			SWIPL::nondet "ruby_nondet_true", 0 do
 				true
 			end
-
-			solutions = []
-			SWIPL::PrologFrame.on do |frame|
-				predicate = SWIPL::Predicate.find( "ruby_nondet_true", 0 )
-				query = predicate.query_normally_with( frame, [] )
-				begin
-					query.each_solution do |solution|
-						solutions.push( solution )
-					end
-				ensure
-					query.close
-				end
-			end
-			expect( solutions ).to eq [[]]
+			expect( SWIPL::find_all( "ruby_nondet_true" ) ).to eq [[]]
 		end
 	
 		it "nothing when returning false on initial" do
 			SWIPL::nondet "ruby_nondet_false", 0 do
 				false
 			end
-
-			solutions = []
-			SWIPL::PrologFrame.on do |frame|
-				predicate = SWIPL::Predicate.find( "ruby_nondet_false", 0 )
-				query = predicate.query_normally_with( frame, [] )
-				begin
-					query.each_solution do |solution|
-						solutions.push( solution )
-					end
-				ensure
-					query.close
-				end
-			end
-			expect( solutions ).to eq []
+			expect( SWIPL::find_all( "ruby_nondet_false" ) ).to eq []
 		end
 	end
 end
