@@ -82,6 +82,8 @@ module SWIPL
 			@state = state
 		end
 
+		def context; @context ; end
+		def context=( value ); @context = value ; end
 		def first_call?; @state == PL_FIRST_CALL; end
 		def pruning?; @state == PL_PRUNED; end
 		def redo?; @state == PL_REDO; end
@@ -102,6 +104,7 @@ module SWIPL
 			end
 
 			stage = ForeignControl.new CFFI.PL_foreign_control( control )
+			stage.context = CFFI.PL_foreign_context_address( control ) unless stage.first_call?
 			frame = ForeignFrame.new
 			handler.call( stage , arguments, frame, control )
 		end

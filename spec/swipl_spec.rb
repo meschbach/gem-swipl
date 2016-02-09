@@ -116,7 +116,7 @@ describe SWIPL do
 		it "backtracks across all solutions" do
 			inputs = ["cast","iron","chef"]
 			result = nil
-			SWIPL::nondet "ruby_nondet_retry", 1 do |control, arguments, frame, raw_control|
+			SWIPL::nondet "ruby_nondet_retry", 1 do | control, arguments |
 				if control.first_call?
 					arguments[0].unify_atom_chars( inputs[0] )
 					ptr = FFI::MemoryPointer.new( :int, 1 )
@@ -125,7 +125,7 @@ describe SWIPL do
 				elsif control.pruning?
 					puts "Pruning"
 				elsif control.redo?
-					resume = SWIPL::CFFI.PL_foreign_context_address( raw_control )
+					resume = control.context
 					index = resume[0].read_int
 					if index >= inputs.length
 						result = SWIPL::PL_FALSE
@@ -143,7 +143,7 @@ describe SWIPL do
 			SWIPL::PrologFrame.on do |frame|
 				term = frame.ref
 				result = SWIPL::find_all( "ruby_nondet_retry", [term] ) do
-					|s| s.map {|y| y.ground? ? y.as_atom : "<not ground>" }
+					|solution| solution.map {|term| term.ground? ? term.as_atom : "<not ground>" }
 				end
 				expect( result ).to eq [ ["cast"], ["iron"], ["chef"] ]
 			end
