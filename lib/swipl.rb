@@ -9,8 +9,15 @@ module SWIPL
 	PL_FALSE = 0
 	PL_TRUE = 1
 	PL_FAIL = PL_FALSE
+
 	PL_Q_NORMAL = 2
+
 	PL_FA_VARARGS =  8
+	PL_FA_NONDETERMINISTIC = 4
+
+	PL_FIRST_CALL = 0
+	PL_PRUNED = 1
+	PL_REDO = 2
 
 	def self.verify( fact )
 		CFFI.init
@@ -70,39 +77,51 @@ module SWIPL
 		raise "Failed to register" unless CFFI.PL_register_foreign( name_ptr, arity, trampoline, PL_FA_VARARGS )
 	end
 
-	def self.nondet( name, arity, &block )
+	class ForeignControl
+		def initialize( state )
+			@state = state
+		end
+
+		def first_call?; @state == PL_FIRST_CALL; end
+		def pruning?; @state == PL_PRUNED; end
+		def redo?; @state == PL_REDO; end
+	end
+
+	class ForeignFrame
+	end
+
+	def self.nondet( name, arity, &handler )
 		@registered = {} unless @registered
 		raise "predicate by that name is already registered" if @registered[ name ]
 
-		trampoline = FFI::Function.new( :uint, [:ulong, :int, :pointer] ) do |arg_base, arity, control|
-			stage = CFFI.PL_foreign_control( control )
+		trampoline = CFFI::predicate_proc do |arg_base, arity, control|
+			result = nil
 
 			arguments = (0..(arity -1 )).map do |index|
 				Term.new( arg_base + index )
 			end
 
-			if block.call( arguments )
-				CFFI::PL_succeed()
-			else
-				PL_FALSE
-			end
+			stage = ForeignControl.new CFFI.PL_foreign_control( control )
+			frame = ForeignFrame.new
+			handler.call( stage , arguments, frame, control )
 		end
+		@registered[name] = trampoline
 
 		name_ptr = FFI::MemoryPointer.from_string( name.to_s )
-		raise "Failed to register" unless CFFI.PL_register_foreign( name_ptr, arity, trampoline, PL_FA_VARARGS )
+		raise "Failed to register" unless CFFI.PL_register_foreign( name_ptr, arity, trampoline, PL_FA_VARARGS | PL_FA_NONDETERMINISTIC )
 	end
 
 	#
-	# TODO: expand to support arity > 0 
 	#
-	def self.find_all( name, args = [] )
+	def self.find_all( name, args = [], &solution_handler )
+		solution_handler = Proc.new { |s| s } unless solution_handler
 		solutions = []
 		SWIPL::PrologFrame.on do |frame|
 			predicate = SWIPL::Predicate.find( name, args.length )
 			query = predicate.query_normally_with( frame, args )
 			begin
 				query.each_solution do |solution|
-					solutions.push( solution )
+					solutions.push( solution_handler.call(solution) )
 				end
 			ensure
 				query.close

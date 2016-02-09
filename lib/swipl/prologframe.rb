@@ -43,6 +43,10 @@ module SWIPL
 			end
 		end
 
+		def ref
+			refs(1)[0]
+		end
+
 		def atom_from_string( string )
 			atom_ptr = FFI::MemoryPointer.from_string( string.to_s )
 			atom_term = CFFI.PL_new_term_ref

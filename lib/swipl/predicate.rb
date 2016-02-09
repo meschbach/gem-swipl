@@ -33,6 +33,7 @@ module SWIPL
 			base_ref = params.length > 0 ? params[0].id : 0
 
 			query_id = CFFI.PL_open_query( nil, PL_Q_NORMAL, @pred_id, base_ref )
+			raise "Failed to allocate query #{query_id}" if query_id == 0
 			Query.new( query_id, params )
 		end
 	end

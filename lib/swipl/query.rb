@@ -8,13 +8,17 @@ module SWIPL
 		end
 
 		def next_solution?
-			CFFI.PL_next_solution( @query_id ) == PL_TRUE 
+			CFFI.PL_next_solution( @query_id ) == PL_TRUE
 		end
 
 		def each_solution
 			while next_solution?
 				yield(@terms)
 			end
+		end
+
+		def terms
+			@terms
 		end
 
 		def close
