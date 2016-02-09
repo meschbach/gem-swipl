@@ -6,8 +6,8 @@ require 'swipl/term'
 require "swipl/version"
 
 module SWIPL
+	PL_FALSE = 0
 	PL_TRUE = 1
-	PL_FALSE = 2
 	PL_FAIL = PL_FALSE
 	PL_Q_NORMAL = 2
 	PL_FA_VARARGS =  8
@@ -39,6 +39,12 @@ module SWIPL
 	def self.truth( fact )
 		unless self.verify( fact )
 			raise "Truth '#{fact}' failed"
+		end
+	end
+
+	def self.fallacy( fact )
+		if self.verify( fact )
+			raise "Fallacy '#{fact}' is true"
 		end
 	end
 

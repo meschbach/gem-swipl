@@ -90,5 +90,13 @@ describe SWIPL do
 			SWIPL::truth( "ruby_predicate_multi_in( one, two )" )
 			expect( capture ).to eq ["one", "two"]
 		end
+
+		it 'fails when the predicate fails' do
+			SWIPL::ruby_predicate "ruby_predicate_false", 0 do |args|
+				false
+			end
+			SWIPL::fallacy( "ruby_predicate_false" )
+		end
 	end
 end
+
