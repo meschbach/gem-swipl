@@ -3,6 +3,9 @@ require 'ffi'
 module SWIPL
 	module CFFI
 		extend FFI::Library
+		typedef :pointer, :foreign_t
+		typedef :pointer, :control_t
+		typedef :ulong, :term_t
 
 		def self.import_symbols
 			attach_function :PL_open_foreign_frame, [], :ulong
@@ -14,19 +17,34 @@ module SWIPL
 			attach_function :PL_call, [:ulong, :pointer], :int
 			attach_function :PL_chars_to_term, [:pointer, :ulong], :int
 			attach_function :PL_close_query, [:ulong], :void
+			attach_function :PL_foreign_control, [:control_t], :int
+			attach_function :PL_foreign_context_address, [:control_t], :pointer
+			attach_function :long_PL_foreign_context_address, :PL_foreign_context_address, [:control_t], :ulong
 			attach_function :PL_get_atom_chars, [:ulong, :pointer], :int
 			attach_function :PL_initialise, [:int, :pointer], :int
-			attach_function :PL_is_atom, [:ulong], :int
-			attach_function :PL_is_ground, [:ulong], :int
+			attach_function :PL_is_atom, [:term_t], :int
+			attach_function :PL_is_ground, [:term_t], :int
 			attach_function :PL_new_atom, [:pointer], :ulong
-			attach_function :PL_new_term_ref, [], :ulong
-			attach_function :PL_new_term_refs, [:int], :ulong
+			attach_function :PL_new_term_ref, [], :term_t
+			attach_function :PL_new_term_refs, [:int], :term_t
 			attach_function :PL_next_solution, [:ulong], :int
-			attach_function :PL_open_query, [:pointer, :int, :ulong, :ulong], :ulong
+			attach_function :PL_open_query, [:pointer, :int, :ulong, :term_t], :ulong
+			attach_function :PL_put_atom_chars, [ :term_t, :string], :int
+			attach_function :PL_put_string_chars, [ :term_t, :string], :void
 			attach_function :PL_predicate, [:pointer, :int, :pointer], :ulong
+			attach_function :PL_register_foreign, [:pointer, :int, :pointer, :int], :foreign_t
+			attach_function :_PL_retry_address, [ :pointer ], :foreign_t
+			attach_function :_PL_retry, [ :pointer ], :foreign_t
+			attach_function :PL_term_type, [:term_t], :int
 			attach_function :PL_thread_self, [], :int
-			attach_function :PL_unify, [ :ulong, :ulong ], :int
+			attach_function :PL_unify, [ :term_t, :term_t ], :int
+			attach_function :PL_unify_string_chars, [ :ulong, :string], :void
+			attach_function :PL_unify_atom_chars, [ :term_t, :string], :void
 		end
+
+		def self.PL_succeed; PL_TRUE; end
+		def self.PL_retry_address( what ); _PL_retry_address( what ).address; end
+		def self.PL_retry( ptr ); _PL_retry( ptr ).address; end
 
 		def self.load( libraries )
 			ffi_lib libraries
@@ -55,6 +73,10 @@ module SWIPL
 			end
 
 			@is_initialized = true
+		end
+		
+		def self.predicate_proc( &handler )
+			FFI::Function.new( :size_t, [:ulong, :int, :pointer], handler ) 
 		end
 	end
 end
