@@ -56,7 +56,7 @@ describe SWIPL do
 		SWIPL::truth( "unload_file('spec/food.pl')" )
 	end
 
-	describe "Ruby predicates" do
+	describe "Deterministics Predicates" do
 		it 'succeeds with a single argument' do
 			capture = nil
 			SWIPL::ruby_predicate "ruby_predicate_1", 1 do |args|
@@ -96,6 +96,29 @@ describe SWIPL do
 				false
 			end
 			SWIPL::fallacy( "ruby_predicate_false" )
+		end
+
+	end
+
+	describe "Nondeterminsitic predicates" do
+		it "true when returning true" do
+			SWIPL::nondet "ruby_nondet_true", 0 do
+				true
+			end
+
+			solutions = []
+			SWIPL::PrologFrame.on do |frame|
+				predicate = SWIPL::Predicate.find( "ruby_nondet_true", 0 )
+				query = predicate.query_normally_with( frame, [] )
+				begin
+					query.each_solution do |solution|
+						solutions.push( solution )
+					end
+				ensure
+					query.close
+				end
+			end
+			expect( solutions ).to eq [[]]
 		end
 	end
 end

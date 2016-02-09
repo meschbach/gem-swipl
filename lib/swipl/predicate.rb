@@ -30,7 +30,9 @@ module SWIPL
 				end
 			end
 
-			query_id = CFFI.PL_open_query( nil, PL_Q_NORMAL, @pred_id, params[0].id )
+			base_ref = params.length > 0 ? params[0].id : 0
+
+			query_id = CFFI.PL_open_query( nil, PL_Q_NORMAL, @pred_id, base_ref )
 			Query.new( query_id, params )
 		end
 	end

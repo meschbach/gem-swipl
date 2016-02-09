@@ -2,6 +2,7 @@
 module SWIPL
 	class Query
 		def initialize( qid, terms )
+			raise "query_id is nil" unless qid
 			@query_id = qid
 			@terms = terms
 		end

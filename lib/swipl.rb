@@ -69,5 +69,27 @@ module SWIPL
 		name_ptr = FFI::MemoryPointer.from_string( name.to_s )
 		raise "Failed to register" unless CFFI.PL_register_foreign( name_ptr, arity, trampoline, PL_FA_VARARGS )
 	end
+
+	def self.nondet( name, arity, &block )
+		@registered = {} unless @registered
+		raise "predicate by that name is already registered" if @registered[ name ]
+
+		trampoline = FFI::Function.new( :uint, [:ulong, :int, :pointer] ) do |arg_base, arity, control|
+			stage = CFFI.PL_foreign_control( control )
+
+			arguments = (0..(arity -1 )).map do |index|
+				Term.new( arg_base + index )
+			end
+
+			if block.call( arguments )
+				CFFI::PL_succeed()
+			else
+				PL_FALSE
+			end
+		end
+
+		name_ptr = FFI::MemoryPointer.from_string( name.to_s )
+		raise "Failed to register" unless CFFI.PL_register_foreign( name_ptr, arity, trampoline, PL_FA_VARARGS )
+	end
 end
 
