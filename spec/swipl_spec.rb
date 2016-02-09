@@ -78,5 +78,17 @@ describe SWIPL do
 			SWIPL::truth( "ruby_predicate_atom_in(toast)" )
 			expect( capture ).to eq "toast"
 		end
+
+		it 'passes in multiple variables' do
+			capture = nil
+			SWIPL::ruby_predicate "ruby_predicate_multi_in", 2 do |args|
+				capture = args.map do |arg|
+					arg.as_atom
+				end
+			end
+			expect( capture ).to be_nil
+			SWIPL::truth( "ruby_predicate_multi_in( one, two )" )
+			expect( capture ).to eq ["one", "two"]
+		end
 	end
 end
