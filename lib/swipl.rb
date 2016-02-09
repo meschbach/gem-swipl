@@ -55,7 +55,7 @@ module SWIPL
 		end
 	end
 
-	def self.ruby_predicate( name, arity, &block )
+	def self.deterministic( name, arity, &block )
 		@registered = {} unless @registered
 		raise "predicate by that name is already registered" if @registered[ name ]
 

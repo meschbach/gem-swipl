@@ -59,7 +59,7 @@ describe SWIPL do
 	describe "Deterministics Predicates" do
 		it 'succeeds with a single argument' do
 			capture = nil
-			SWIPL::ruby_predicate "ruby_predicate_1", 1 do |args|
+			SWIPL::deterministic "ruby_predicate_1", 1 do |args|
 				capture = args
 				true
 			end
@@ -70,7 +70,7 @@ describe SWIPL do
 
 		it 'correctly passes atoms in' do
 			capture = nil
-			SWIPL::ruby_predicate "ruby_predicate_atom_in", 1 do |args|
+			SWIPL::deterministic "ruby_predicate_atom_in", 1 do |args|
 				capture = args[0].as_atom
 				true
 			end
@@ -81,7 +81,7 @@ describe SWIPL do
 
 		it 'passes in multiple variables' do
 			capture = nil
-			SWIPL::ruby_predicate "ruby_predicate_multi_in", 2 do |args|
+			SWIPL::deterministic "ruby_predicate_multi_in", 2 do |args|
 				capture = args.map do |arg|
 					arg.as_atom
 				end
@@ -92,7 +92,7 @@ describe SWIPL do
 		end
 
 		it 'fails when the predicate fails' do
-			SWIPL::ruby_predicate "ruby_predicate_false", 0 do |args|
+			SWIPL::deterministic "ruby_predicate_false", 0 do |args|
 				false
 			end
 			SWIPL::fallacy( "ruby_predicate_false" )
