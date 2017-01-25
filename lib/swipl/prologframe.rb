@@ -15,13 +15,25 @@ module SWIPL
 		# Opens a foreign frame
 		def self.open
 			frame_id = CFFI.PL_open_foreign_frame
-			if frame_id == PL_FALSE 
+			if frame_id == PL_FALSE
 				raise "failed to open frame"
 			end
 			PrologFrame.new( frame_id )
 		end
 
 		def self.on( &block )
+			id = CFFI.PL_thread_self
+			if id == -1
+				context = CFFI::PL_thread_attr_t.new
+				context.global_size = 16 * 1024
+				context.local_size = 8 * 1024
+				context.trail_size = 4 * 1024
+				context.argument_size = 4 * 1024
+				context.alias_name = 0
+				context.cancel = 0
+				context.flags = 0
+			end
+
 			frame = self.open
 			begin
 				block.call( frame )

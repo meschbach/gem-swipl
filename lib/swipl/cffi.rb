@@ -7,6 +7,16 @@ module SWIPL
 		typedef :pointer, :control_t
 		typedef :ulong, :term_t
 
+		class PL_thread_attr_t < FFI::Struct
+			layout	:local_size,	:ulong,
+				:global_size,	:ulong,
+				:trail_size,	:ulong,
+				:argument_size, :ulong,
+				:alias_name,	:pointer,
+				:cancel,	:pointer,
+				:flags,		:pointer
+		end
+
 		def self.import_symbols
 			attach_function :PL_open_foreign_frame, [], :ulong
 			attach_function :PL_discard_foreign_frame, [:ulong], :int
@@ -40,6 +50,12 @@ module SWIPL
 			attach_function :PL_unify, [ :term_t, :term_t ], :int
 			attach_function :PL_unify_string_chars, [ :ulong, :string], :void
 			attach_function :PL_unify_atom_chars, [ :term_t, :string], :void
+
+			# 1 thread : 1 prolog engine pool
+			# http://www.swi-prolog.org/pldoc/man?section=foreignthread
+			attach_function :PL_thread_self, [], :int
+			attach_function :PL_thread_attach_engine, [:pointer], :int
+			attach_function :PL_thread_destroy_engine, [], :int
 		end
 
 		def self.PL_succeed; PL_TRUE; end
@@ -74,9 +90,9 @@ module SWIPL
 
 			@is_initialized = true
 		end
-		
+
 		def self.predicate_proc( &handler )
-			FFI::Function.new( :size_t, [:ulong, :int, :pointer], handler ) 
+			FFI::Function.new( :size_t, [:ulong, :int, :pointer], handler )
 		end
 	end
 end
