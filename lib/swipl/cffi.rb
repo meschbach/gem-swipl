@@ -79,13 +79,13 @@ module SWIPL
 			return if @is_initialized
 			self.bootstrap unless @ffi_libs
 
-			args = [ @swipl_lib ]
+			args = [ @swipl_lib, "-tty", "-q", "-t", "true", "-g", "true" ]
+
+			cargs = args.map { |arg| ::FFI::MemoryPointer.from_string( arg ) }
 
 			plargv = ::FFI::MemoryPointer.new( :pointer, args.count + 1 )
-			args.each do |arg|
-				ptr = ::FFI::MemoryPointer.from_string( arg )
-				plargv.write_pointer( ptr )
-			end
+			plargv.write_array_of_pointer cargs
+			@pl_argv = plargv
 
 			value = PL_initialise( args.count, plargv )
 			if value != 1
