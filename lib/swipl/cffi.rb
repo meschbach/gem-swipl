@@ -79,11 +79,15 @@ module SWIPL
 			return if @is_initialized
 			self.bootstrap unless @ffi_libs
 
-			libptr = ::FFI::MemoryPointer.from_string( @swipl_lib )
-			plargv = ::FFI::MemoryPointer.new( :pointer, 1 )
-			plargv.write_pointer( libptr )
+			args = [ @swipl_lib ]
 
-			value = PL_initialise( 1, plargv )
+			plargv = ::FFI::MemoryPointer.new( :pointer, args.count + 1 )
+			args.each do |arg|
+				ptr = ::FFI::MemoryPointer.from_string( arg )
+				plargv.write_pointer( ptr )
+			end
+
+			value = PL_initialise( args.count, plargv )
 			if value != 1
 				raise "SWI failed to initialize"
 			end
