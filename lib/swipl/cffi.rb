@@ -79,7 +79,7 @@ module SWIPL
 			return if @is_initialized
 			self.bootstrap unless @ffi_libs
 
-			args = [ @swipl_lib, "-tty", "-q", "-t", "true", "-g", "true" ]
+			args = [ @swipl_lib, "-tty", "-q", "-t", "true", "-g", "true", "--nodebug", "--nosignals" ]
 
 			cargs = args.map { |arg| ::FFI::MemoryPointer.from_string( arg ) }
 
