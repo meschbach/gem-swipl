@@ -76,5 +76,16 @@ module SWIPL
 			end
 			Term.new( atom_term )
 		end
+
+		def list_from_terms( terms )
+			list_term = CFFI.PL_new_term_ref
+
+			# TODO: These should probably be moved out to Term
+			CFFI.PL_put_nil( list_term )
+			terms.reverse.each do |term|
+				CFFI.PL_cons_list( list_term, term.to_i, list_term )
+			end
+			Term.new( list_term )
+		end
 	end
 end

@@ -46,10 +46,15 @@ module SWIPL
 			attach_function :_PL_retry_address, [ :pointer ], :foreign_t
 			attach_function :_PL_retry, [ :pointer ], :foreign_t
 			attach_function :PL_term_type, [:term_t], :int
-			attach_function :PL_thread_self, [], :int
 			attach_function :PL_unify, [ :term_t, :term_t ], :int
 			attach_function :PL_unify_string_chars, [ :ulong, :string], :void
 			attach_function :PL_unify_atom_chars, [ :term_t, :string], :void
+
+			#
+			# List construction
+			# http://www.swi-prolog.org/pldoc/doc_for?object=c(%27PL_cons_list%27)
+			attach_function :PL_cons_list, [ :term_t, :term_t, :term_t ], :int
+			attach_function :PL_put_nil, [ :term_t ], :int  # put list terminator
 
 			# 1 thread : 1 prolog engine pool
 			# http://www.swi-prolog.org/pldoc/man?section=foreignthread

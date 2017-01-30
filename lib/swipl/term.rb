@@ -90,5 +90,9 @@ module SWIPL
 				"variable"
 			end
 		end
+
+		def to_i
+			@term_id
+		end
 	end
 end
