@@ -39,6 +39,10 @@ module SWIPL
 			CFFI.PL_is_atom( @term_id ) == PL_TRUE 
 		end
 
+		def matches_atom?( to_string )
+			atom? and as_atom == to_string
+		end
+
 		PL_VARIABLE = 1
 		PL_ATOM = 2
 		PL_NIL = 7
@@ -85,6 +89,10 @@ module SWIPL
 			else
 				"variable"
 			end
+		end
+
+		def to_i
+			@term_id
 		end
 	end
 end

@@ -46,10 +46,15 @@ module SWIPL
 			attach_function :_PL_retry_address, [ :pointer ], :foreign_t
 			attach_function :_PL_retry, [ :pointer ], :foreign_t
 			attach_function :PL_term_type, [:term_t], :int
-			attach_function :PL_thread_self, [], :int
 			attach_function :PL_unify, [ :term_t, :term_t ], :int
 			attach_function :PL_unify_string_chars, [ :ulong, :string], :void
 			attach_function :PL_unify_atom_chars, [ :term_t, :string], :void
+
+			#
+			# List construction
+			# http://www.swi-prolog.org/pldoc/doc_for?object=c(%27PL_cons_list%27)
+			attach_function :PL_cons_list, [ :term_t, :term_t, :term_t ], :int
+			attach_function :PL_put_nil, [ :term_t ], :int  # put list terminator
 
 			# 1 thread : 1 prolog engine pool
 			# http://www.swi-prolog.org/pldoc/man?section=foreignthread
@@ -79,11 +84,15 @@ module SWIPL
 			return if @is_initialized
 			self.bootstrap unless @ffi_libs
 
-			libptr = ::FFI::MemoryPointer.from_string( @swipl_lib )
-			plargv = ::FFI::MemoryPointer.new( :pointer, 1 )
-			plargv.write_pointer( libptr )
+			args = [ @swipl_lib, "-tty", "-q", "-t", "true", "-g", "true", "--nodebug", "--nosignals" ]
 
-			value = PL_initialise( 1, plargv )
+			cargs = args.map { |arg| ::FFI::MemoryPointer.from_string( arg ) }
+
+			plargv = ::FFI::MemoryPointer.new( :pointer, args.count + 1 )
+			plargv.write_array_of_pointer cargs
+			@pl_argv = plargv
+
+			value = PL_initialise( args.count, plargv )
 			if value != 1
 				raise "SWI failed to initialize"
 			end

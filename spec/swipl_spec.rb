@@ -149,5 +149,21 @@ describe SWIPL do
 			end
 		end
 	end
+
+	describe "list construction" do
+		it "can construct a list from a set of terms" do
+			SWIPL::PrologFrame.on do |frame|
+				ruby_terms = ["get","happy","lose","control"].map { |e| frame.atom_from_string( e ) }
+				ruby_list = frame.list_from_terms( ruby_terms )
+				SWIPL::verify("assert( 'PL_cons_list'([get,happy,lose,control]) )")
+				cursor = SWIPL::Predicate.find( "PL_cons_list", 1 ).query_normally_with( frame, [ruby_list] )
+				begin
+					expect( cursor.next_solution? ).to be(true)
+				ensure
+					cursor.close
+				end
+			end
+		end
+	end
 end
 

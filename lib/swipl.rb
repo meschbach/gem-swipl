@@ -22,7 +22,7 @@ module SWIPL
 	def self.verify( fact )
 		CFFI.init
 		PrologFrame.on do |frame|
-			atom = frame.atom_from_string( fact )
+			atom = frame.term_from_string( fact )
 			CFFI.PL_call( atom.term_id, nil ) == PL_TRUE
 		end
 	end

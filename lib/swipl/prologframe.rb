@@ -25,13 +25,15 @@ module SWIPL
 			id = CFFI.PL_thread_self
 			if id == -1
 				context = CFFI::PL_thread_attr_t.new
-				context.global_size = 16 * 1024
-				context.local_size = 8 * 1024
-				context.trail_size = 4 * 1024
-				context.argument_size = 4 * 1024
-				context.alias_name = 0
-				context.cancel = 0
-				context.flags = 0
+				context[ :global_size ] = 16 * 1024
+				context[ :local_size ] = 8 * 1024
+				context[ :trail_size ] = 4 * 1024
+				context[ :argument_size ] = 4 * 1024
+				context[ :alias_name ] = 0
+				context[ :cancel ] = 0
+				context[ :flags ] = 0
+
+				CFFI.PL_thread_attach_engine( context )
 			end
 
 			frame = self.open
@@ -60,12 +62,30 @@ module SWIPL
 		end
 
 		def atom_from_string( string )
+			atom_term = CFFI.PL_new_term_ref
+			term = Term.new( atom_term )
+			term.put_atom( string )
+			term
+		end
+
+		def term_from_string( string )
 			atom_ptr = FFI::MemoryPointer.from_string( string.to_s )
 			atom_term = CFFI.PL_new_term_ref
 			if CFFI.PL_chars_to_term( atom_ptr, atom_term ) == 0
 				raise "failed to create atom from terms"
 			end
 			Term.new( atom_term )
+		end
+
+		def list_from_terms( terms )
+			list_term = CFFI.PL_new_term_ref
+
+			# TODO: These should probably be moved out to Term
+			CFFI.PL_put_nil( list_term )
+			terms.reverse.each do |term|
+				CFFI.PL_cons_list( list_term, term.to_i, list_term )
+			end
+			Term.new( list_term )
 		end
 	end
 end
