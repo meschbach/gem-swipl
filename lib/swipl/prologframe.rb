@@ -62,12 +62,10 @@ module SWIPL
 		end
 
 		def atom_from_string( string )
-			#atom_ptr = FFI::MemoryPointer.from_string( string.to_s )
 			atom_term = CFFI.PL_new_term_ref
-			if CFFI.PL_put_atom_chars( atom_term, string ) == 0
-				raise "failed to create atom from string"
-			end
-			Term.new( atom_term )
+			term = Term.new( atom_term )
+			term.put_atom( string )
+			term
 		end
 
 		def term_from_string( string )
